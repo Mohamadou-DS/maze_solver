@@ -33,8 +33,8 @@ Un labyrinthe est modélisé par une matrice 2D (`0`=chemin, `1`=mur, `S`=start,
 
 ### Installation  
 ```bash
-git clone https://github.com/<votre-utilisateur>/maze-solver.git
-cd maze-solver
+git clone https://github.com/Mohamadou-DS/maze_solver.git
+cd maze_solver
 pip install -r requirements.txt
 ```  
 
