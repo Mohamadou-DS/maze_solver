@@ -2,8 +2,9 @@ import argparse
 from maze import Maze
 from bfs import bfs
 from dfs import dfs
-from visualizer import animate_search, show_path
+from visualizer import show_path
 from compare import compare
+import time
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Maze Solver")
@@ -16,6 +17,7 @@ if __name__ == '__main__':
     maze_grid = eval(open(args.file).read())
     maze = Maze(maze_grid)
 
+    start_time = time.time()
     if args.algo == 'bfs':
         path, visited = bfs(maze)
     elif args.algo == 'dfs':
@@ -26,5 +28,4 @@ if __name__ == '__main__':
 
     print(f"Visited: {len(visited)}, Path length: {len(path)}")
     if args.visual:
-        animate_search(maze, visited, path)
         show_path(maze, path, visited)

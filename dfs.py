@@ -19,7 +19,7 @@ def dfs(maze):
             if nxt not in came_from:
                 came_from[nxt] = u
                 explore(nxt)
-
+ 
     explore(start)
 
     # reconstruct path

@@ -1,52 +1,56 @@
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import matplotlib.colors as mcolors
+import time
+import numpy as np
 
-CELL_SIZE = 1
-COLORS = {
-    'wall': 'black',
+COLORS = { 
     'empty': 'white',
-    'visited': 'lightblue',
-    'path': 'red',
-    'start': 'green',
-    'goal': 'gold'
+    'wall': 'black',
+    'path': 'lightgreen',
+    'visited': 'lightgray',
+    'start': 'blue',
+    'goal': 'orange'
 }
 
-def draw_step(ax, maze, visited, path):
+# Ordre utilisé pour la palette
+color_order = ['empty', 'wall', 'path', 'visited', 'start', 'goal']
+code_to_index = {name: i for i, name in enumerate(color_order)}
+cmap = mcolors.ListedColormap([COLORS[name] for name in color_order])
+
+def draw_step(ax, maze, visited_cells=set(), path=[]):
+    grid = maze.grid
+    nrows, ncols = len(grid), len(grid[0])
+    visual_grid = np.full((nrows, ncols), code_to_index['empty'])
+
+    for i in range(nrows):
+        for j in range(ncols):
+            if grid[i][j] == 1:
+                visual_grid[i][j] = code_to_index['wall']
+
+    for i, j in visited_cells:
+        if grid[i][j] == 0:
+            visual_grid[i][j] = code_to_index['visited']
+
+    for i, j in path:
+        visual_grid[i][j] = code_to_index['path']
+
+    si, sj = maze.start
+    gi, gj = maze.goal
+    visual_grid[si][sj] = code_to_index['start']
+    visual_grid[gi][gj] = code_to_index['goal']
+
     ax.clear()
-    rows, cols = maze.rows, maze.cols
-    for i in range(rows):
-        for j in range(cols):
-            cell = maze.grid[i][j]
-            if (i, j) in path:
-                color = COLORS['path']
-            elif (i, j) == maze.start:
-                color = COLORS['start']
-            elif (i, j) == maze.goal:
-                color = COLORS['goal']
-            elif (i, j) in visited:
-                color = COLORS['visited']
-            elif cell == 1:
-                color = COLORS['wall']
-            else:
-                color = COLORS['empty']
-            rect = plt.Rectangle((j, rows-i-1), CELL_SIZE, CELL_SIZE, facecolor=color, edgecolor='gray')
-            ax.add_patch(rect)
-    ax.set_xlim(0, cols)
-    ax.set_ylim(0, rows)
+    ax.imshow(visual_grid, cmap=cmap)
     ax.set_xticks([])
     ax.set_yticks([])
+    ax.set_title("Exploration + Chemin final\n")
+    
+    plt.pause(0.3)
 
-
-def animate_search(maze, visited_order, path):
+def show_path(maze, path, visited_cells=None):
+    visited_cells = visited_cells or []
     fig, ax = plt.subplots()
-    def update(frame):
-        visited = visited_order[:frame]
-        draw_step(ax, maze, visited, [])
-    ani = animation.FuncAnimation(fig, update, frames=len(visited_order), interval=50)
-    plt.show()
-
-
-def show_path(maze, path, visited):
-    fig, ax = plt.subplots()
-    draw_step(ax, maze, visited, path)
+    for i in range(len(visited_cells)):
+        draw_step(ax, maze, visited_cells[:i + 1], [])
+    draw_step(ax, maze, visited_cells, path)
     plt.show()
